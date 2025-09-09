@@ -8,12 +8,10 @@ def scrape_olx(query="car-cover", output_file="olx_car_cover.csv"):
     url = f"https://www.olx.in/items/q-{query}"
 
     options = webdriver.ChromeOptions()
-    # options.add_argument("--headless")  # keep visible for debugging
     driver = webdriver.Chrome(options=options)
 
     driver.get(url)
 
-    # wait until some links to items appear
     WebDriverWait(driver, 15).until(
         EC.presence_of_all_elements_located((By.CSS_SELECTOR, "li a"))
     )
@@ -23,18 +21,18 @@ def scrape_olx(query="car-cover", output_file="olx_car_cover.csv"):
 
     for item in items:
         try:
-            title = item.text.strip().split("\n")[0]  # first line is usually title
+            title = item.text.strip().split("\n")[0]  
         except:
             title = "N/A"
 
         try:
-            # look for ₹ in the text block
+
             price = next((line for line in item.text.split("\n") if "₹" in line), "N/A")
         except:
             price = "N/A"
 
         try:
-            # often last line is location
+            
             lines = item.text.split("\n")
             location = lines[-1] if len(lines) > 1 else "N/A"
         except:
@@ -45,7 +43,7 @@ def scrape_olx(query="car-cover", output_file="olx_car_cover.csv"):
         except:
             link = "N/A"
 
-        if title != "N/A":  # ignore empty anchors
+        if title != "N/A":  
             results.append([title, price, location, link])
 
     driver.quit()
@@ -55,7 +53,7 @@ def scrape_olx(query="car-cover", output_file="olx_car_cover.csv"):
         writer.writerow(["Title", "Price", "Location", "Link"])
         writer.writerows(results)
 
-    print(f"✅ Scraping completed. {len(results)} items saved in {output_file}")
+    print(f"Scraping completed. {len(results)} items saved in {output_file}")
 
 if __name__ == "__main__":
     scrape_olx()
